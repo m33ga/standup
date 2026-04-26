@@ -8,20 +8,10 @@ function App() {
   }, []);
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontFamily: "system-ui, sans-serif",
-      }}
-    >
-      <div style={{ textAlign: "center" }}>
-        <h1 style={{ fontSize: 56, margin: 0, letterSpacing: "-0.02em" }}>
-          standup.
-        </h1>
-        <p style={{ marginTop: 8, opacity: 0.6 }}>
+    <div className="flex min-h-screen items-center justify-center bg-amber-50 text-stone-900">
+      <div className="text-center">
+        <h1 className="text-6xl font-bold tracking-tight">standup.</h1>
+        <p className="mt-3 text-base text-stone-600">
           {seedGroups.length} groups & {seedMeetings.length} meetings (in
           devtools)
         </p>
