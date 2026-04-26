@@ -1,1 +1,60 @@
 @import "tailwindcss";
+
+@theme {
+  /* light */
+  --color-paper: #f6f1e7;
+  --color-paper-2: #efe7d4;
+  --color-ink: #161412;
+  --color-yolk: #f4d35e;
+  --color-mint: #a8c9a5;
+  --color-sky: #a8c5d6;
+  --color-lilac: #c8b6d6;
+  --color-peach: #f4b393;
+  --color-tomato: #e07a5f;
+
+  /* typography */
+  --font-display: "Space Grotesk", sans-serif;
+  --font-sans: "Inter", sans-serif;
+  --font-hand: "Caveat", cursive;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* neo-brutalism shadows */
+  --shadow-paper-sm: 2px 2px 0 0 var(--color-ink);
+  --shadow-paper: 4px 4px 0 0 var(--color-ink);
+  --shadow-paper-md: 5px 5px 0 0 var(--color-ink);
+  --shadow-paper-lg: 6px 6px 0 0 var(--color-ink);
+}
+
+/* dark theme */
+[data-theme="dark"] {
+  --color-paper: #1a1714;
+  --color-paper-2: #221d18;
+  --color-ink: #f6f1e7;
+}
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background-color: var(--color-yolk);
+  color: var(--color-ink);
+}
