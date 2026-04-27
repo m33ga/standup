@@ -3,18 +3,19 @@ export type Id = string;
 // survives JSON round-trip;
 export type IsoDate = string;
 
+export const SECTION_KEYS = [
+  "promised",
+  "done",
+  "willDo",
+  "discussion",
+  "notes",
+] as const;
+export type SectionKey = (typeof SECTION_KEYS)[number];
+
 export type Group = {
   id: Id;
   name: string;
   pinned: boolean;
-};
-
-export type MeetingSections = {
-  promised: string;
-  done: string;
-  willDo: string;
-  discussion: string;
-  notes: string;
 };
 
 export type Meeting = {
@@ -23,5 +24,4 @@ export type Meeting = {
   title: string;
   date: IsoDate;
   completed: boolean;
-  sections: MeetingSections;
-};
+} & Record<SectionKey, string>;
