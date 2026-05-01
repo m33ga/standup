@@ -2,7 +2,7 @@ import { Tape } from "./Tape";
 
 export function EmptyState() {
   return (
-    <div className="flex flex-1 items-center justify-center p-10">
+    <div className="flex flex-1 items-center justify-center p-10 min-h-screen">
       <div className="max-w-md text-center">
         <h1 className="font-display text-5xl font-bold tracking-tight text-ink">
           nothing selected.
