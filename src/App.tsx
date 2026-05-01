@@ -1,27 +1,36 @@
-import { useEffect } from "react";
-import { Tape } from "./components/Tape";
+import { EmptyState } from "./components/EmptyState";
+import { MeetingView } from "./components/MeetingView";
+import { Sidebar } from "./components/Sidebar";
 import { seedGroups, seedMeetings } from "./types/seed";
 
 function App() {
-  useEffect(() => {
-    console.log("seed groups:", seedGroups);
-    console.log("seed meetings:", seedMeetings);
-  }, []);
+  const selectedMeetingId = "m3";
+  const expandedGroupIds = { g1: true, g2: true };
+  const query = "";
+  const theme = "light" as const;
+
+  const meeting = seedMeetings.find((m) => m.id === selectedMeetingId);
+  const group = meeting
+    ? seedGroups.find((g) => g.id === meeting.groupId)
+    : undefined;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-paper px-6 text-ink">
-      <div className="text-center">
-        <h1 className="font-display text-6xl font-bold tracking-tight">
-          standup.
-        </h1>
-        <p className="mt-3 font-sans text-lg text-ink/60">
-          {seedGroups.length} groups & {seedMeetings.length} meetings (in
-          devtools)
-        </p>
-        <div className="mt-8 inline-block">
-          <Tape rotate={-2}>hello world</Tape>
-        </div>
-      </div>
+    <div className="flex min-h-screen bg-paper text-ink">
+      <Sidebar
+        groups={seedGroups}
+        meetings={seedMeetings}
+        selectedMeetingId={selectedMeetingId}
+        expandedGroupIds={expandedGroupIds}
+        query={query}
+        theme={theme}
+      />
+      <main className="flex-1">
+        {meeting && group ? (
+          <MeetingView meeting={meeting} group={group} />
+        ) : (
+          <EmptyState />
+        )}
+      </main>
     </div>
   );
 }
