@@ -25,3 +25,5 @@ export type Meeting = {
   date: IsoDate;
   completed: boolean;
 } & Record<SectionKey, string>;
+
+export type Theme = "light" | "dark";
