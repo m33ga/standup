@@ -2,8 +2,8 @@ import { Check } from "lucide-react";
 import type { Id, Meeting } from "../types";
 
 function formatShortDate(iso: string): string {
-  const [, mm, dd] = iso.split("-");
-  return `${dd}.${mm}`;
+  const [yyyy, mm, dd] = iso.split("-");
+  return `${dd}.${mm}.${yyyy}`;
 }
 
 type MeetingListProps = {

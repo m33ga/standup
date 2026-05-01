@@ -1,23 +1,16 @@
 import type { Group, Meeting } from "../types";
 
-const MONTHS = [
-  "jan",
-  "feb",
-  "mar",
-  "apr",
-  "may",
-  "jun",
-  "jul",
-  "aug",
-  "sep",
-  "oct",
-  "nov",
-  "dec",
-];
-
 function formatLongDate(iso: string): string {
-  const [y, m, d] = iso.split("-");
-  return `${parseInt(d, 10)} ${MONTHS[parseInt(m, 10) - 1]} ${y}`;
+  const [y, m, d] = iso.split("-").map(Number);
+  const date = new Date(y, m - 1, d);
+
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  })
+    .format(date)
+    .toLowerCase();
 }
 
 type MeetingHeaderProps = {
