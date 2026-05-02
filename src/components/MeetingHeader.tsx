@@ -33,13 +33,13 @@ export function MeetingHeader({
             as="h1"
             value={meeting.title}
             onChange={(title) => onRename(meeting.id, title)}
-            className="w-full font-display text-5xl leading-none font-bold tracking-tight text-ink"
-            inputClassName="border-[2.5px] border-dashed border-ink bg-paper-2 px-2 py-0.5 outline-none"
-            displayClassName={
+            className="w-full box-border h-[64px] flex items-center font-display text-5xl font-bold tracking-tight text-ink border-[2.5px] px-2"
+            inputClassName="border-dashed border-ink bg-paper-2 outline-none"
+            displayClassName={`border-transparent ${
               meeting.completed
                 ? "line-through decoration-yolk decoration-[7px]"
                 : ""
-            }
+            }`}
             title="click to rename"
           />
         </div>
