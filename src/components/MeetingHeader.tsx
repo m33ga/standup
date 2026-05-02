@@ -1,49 +1,73 @@
-import type { Group, Meeting } from "../types";
-
-function formatLongDate(iso: string): string {
-  const [y, m, d] = iso.split("-").map(Number);
-  const date = new Date(y, m - 1, d);
-
-  return new Intl.DateTimeFormat("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  })
-    .format(date)
-    .toLowerCase();
-}
+import type { Group, Id, IsoDate, Meeting } from "../types";
+import { DatePickerButton } from "./DatePickerButton";
+import { EditableText } from "./EditableText";
 
 type MeetingHeaderProps = {
   meeting: Meeting;
   group: Group;
+  onRename: (id: Id, title: string) => void;
+  onSetDate: (id: Id, date: IsoDate) => void;
+  onToggleCompleted: (id: Id) => void;
+  onDelete: (id: Id) => void;
 };
 
-export function MeetingHeader({ meeting, group }: MeetingHeaderProps) {
+export function MeetingHeader({
+  meeting,
+  group,
+  onRename,
+  onSetDate,
+  onToggleCompleted,
+  onDelete,
+}: MeetingHeaderProps) {
   return (
     <div>
       <div className="flex items-center gap-2 font-sans text-xs text-ink/60">
         <span className="font-semibold text-ink/80">{group.name}</span>
         <span className="opacity-50">/</span>
         <span className="font-mono">meeting</span>
-        {meeting.completed && (
-          <span className="ml-1 inline-flex items-center rounded-full border-2 border-ink bg-mint px-2 py-px font-sans text-[10px] font-bold tracking-widest text-ink uppercase">
-            completed
-          </span>
-        )}
       </div>
 
-      <h1
-        className={`mt-2 font-display text-5xl leading-none font-bold tracking-tight text-ink ${
-          meeting.completed
-            ? "line-through decoration-yolk decoration-[3px]"
-            : ""
-        }`}
-      >
-        {meeting.title}
-      </h1>
+      <div className="mt-2 flex flex-wrap items-start gap-5">
+        <div className="min-w-[320px] flex-1">
+          <EditableText
+            as="h1"
+            value={meeting.title}
+            onChange={(title) => onRename(meeting.id, title)}
+            className="w-full font-display text-5xl leading-none font-bold tracking-tight text-ink"
+            inputClassName="border-[2.5px] border-dashed border-ink bg-paper-2 px-2 py-0.5 outline-none"
+            displayClassName={
+              meeting.completed
+                ? "line-through decoration-yolk decoration-[7px]"
+                : ""
+            }
+            title="click to rename"
+          />
+        </div>
 
-      <div className="mt-3 inline-flex items-center gap-1.5 border-2 border-ink bg-paper-2 px-2.5 py-1 font-mono text-[13px] font-medium text-ink">
-        {formatLongDate(meeting.date)}
+        <div className="flex shrink-0 items-center gap-3">
+          <DatePickerButton
+            value={meeting.date}
+            onChange={(date) => onSetDate(meeting.id, date)}
+          />
+
+          <button
+            type="button"
+            onClick={() => onToggleCompleted(meeting.id)}
+            className={`inline-flex items-center gap-2 border-[3px] border-ink px-3.5 py-2 font-sans text-sm font-semibold text-ink shadow-paper transition-transform duration-100 hover:-translate-x-px hover:-translate-y-px hover:shadow-paper-lg active:translate-x-1 active:translate-y-1 active:shadow-none ${
+              meeting.completed ? "bg-mint" : "bg-paper-2"
+            }`}
+          >
+            {meeting.completed ? "mark undone" : "mark done"}
+          </button>
+          <button
+            type="button"
+            onClick={() => onDelete(meeting.id)}
+            title="delete meeting"
+            className="border-[2.5px] border-ink bg-paper-2 px-3 py-2 font-sans text-sm font-semibold text-tomato shadow-paper transition-transform duration-100 hover:-translate-x-px hover:-translate-y-px hover:shadow-paper-lg active:translate-x-1 active:translate-y-1 active:shadow-none"
+          >
+            delete
+          </button>
+        </div>
       </div>
     </div>
   );

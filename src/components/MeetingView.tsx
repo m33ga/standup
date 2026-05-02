@@ -1,4 +1,4 @@
-import type { Group, Id, Meeting, SectionKey } from "../types";
+import type { Group, Id, IsoDate, Meeting, SectionKey } from "../types";
 import { SECTION_META } from "../utils/sectionsMap";
 import { MeetingHeader } from "./MeetingHeader";
 import { SectionCard } from "./SectionCard";
@@ -16,17 +16,32 @@ const BOTTOM_KEYS = [
 type MeetingViewProps = {
   meeting: Meeting;
   group: Group;
+  onRenameMeeting: (id: Id, title: string) => void;
+  onSetMeetingDate: (id: Id, date: IsoDate) => void;
+  onDeleteMeeting: (id: Id) => void;
+  onToggleCompleted: (id: Id) => void;
   onSetSection: (id: Id, key: SectionKey, value: string) => void;
 };
 
 export function MeetingView({
   meeting,
   group,
+  onRenameMeeting,
+  onSetMeetingDate,
+  onDeleteMeeting,
+  onToggleCompleted,
   onSetSection,
 }: MeetingViewProps) {
   return (
     <div className="mx-auto max-w-[1200px] px-10 py-8 pb-20">
-      <MeetingHeader meeting={meeting} group={group} />
+      <MeetingHeader
+        meeting={meeting}
+        group={group}
+        onRename={onRenameMeeting}
+        onSetDate={onSetMeetingDate}
+        onToggleCompleted={onToggleCompleted}
+        onDelete={onDeleteMeeting}
+      />
 
       <div className="mt-7 flex flex-wrap gap-5">
         {TOP_KEYS.map((k) => (
