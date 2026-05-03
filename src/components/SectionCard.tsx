@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Tape } from "./Tape";
+import ReactMarkdown from "react-markdown";
 
 type SectionCardProps = {
   label: string;
@@ -86,9 +87,9 @@ export function SectionCard({
             />
           </div>
         ) : value.trim() ? (
-          <p className="font-mono text-[15px] leading-relaxed whitespace-pre-wrap text-ink">
-            {value}
-          </p>
+          <div className="prose prose-sm text-ink">
+            <ReactMarkdown>{value}</ReactMarkdown>
+          </div>
         ) : (
           <p className="font-mono text-sm text-ink/50 italic">empty. {hint}.</p>
         )}
