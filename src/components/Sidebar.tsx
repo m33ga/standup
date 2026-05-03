@@ -1,50 +1,19 @@
 import { Search } from "lucide-react";
-import type { Group, Id, Meeting, Theme } from "../types";
+import { useStore } from "../store";
 import { GroupRow } from "./GroupRow";
 import { ThemeToggle } from "./ThemeToggle";
 
-type SidebarProps = {
-  groups: Group[];
-  meetings: Meeting[];
-  selectedMeetingId: Id | null;
-  expandedGroupIds: Record<Id, boolean>;
-  query: string;
-  theme: Theme;
-  pendingRenameGroupId: Id | null;
-  onToggleExpanded: (id: Id) => void;
-  onSelectMeeting: (id: Id) => void;
-  onQuery: (q: string) => void;
-  onToggleTheme: () => void;
-  onCreateGroup: () => void;
-  onRenameGroup: (id: Id, name: string) => void;
-  onDeleteGroup: (id: Id) => void;
-  onTogglePinned: (id: Id) => void;
-  onCreateMeeting: (groupId: Id) => void;
-  onClearPendingRename: () => void;
-};
+export function Sidebar() {
+  const groups = useStore((s) => s.groups);
+  const query = useStore((s) => s.query);
+  const setQuery = useStore((s) => s.setQuery);
+  const createGroup = useStore((s) => s.createGroup);
+  const pendingRenameGroupId = useStore((s) => s.pendingRenameGroupId);
 
-export function Sidebar({
-  groups,
-  meetings,
-  selectedMeetingId,
-  expandedGroupIds,
-  query,
-  theme,
-  pendingRenameGroupId,
-  onToggleExpanded,
-  onSelectMeeting,
-  onQuery,
-  onToggleTheme,
-  onCreateGroup,
-  onRenameGroup,
-  onDeleteGroup,
-  onTogglePinned,
-  onCreateMeeting,
-  onClearPendingRename,
-}: SidebarProps) {
-  const sortedGroups = [...groups].sort(
-    (a, b) => Number(b.pinned) - Number(a.pinned),
-  );
+  const sortedGroups = [...groups].sort((a, b) => {
+    if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+    return b.createdAt.localeCompare(a.createdAt);
+  });
   const visibleGroups = query.trim()
     ? sortedGroups.filter((g) =>
         g.name.toLowerCase().includes(query.toLowerCase()),
@@ -65,7 +34,7 @@ export function Sidebar({
             standup.
           </span>
         </div>
-        <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+        <ThemeToggle />
       </div>
 
       <div className="px-4 pt-4 pb-2.5">
@@ -73,7 +42,7 @@ export function Sidebar({
           <Search size={14} className="text-ink/50" />
           <input
             value={query}
-            onChange={(e) => onQuery(e.target.value)}
+            onChange={(e) => setQuery(e.target.value)}
             placeholder="search groups…"
             className="flex-1 bg-transparent font-sans text-sm text-ink outline-none placeholder:text-ink/40"
           />
@@ -86,7 +55,7 @@ export function Sidebar({
         </div>
         <button
           type="button"
-          onClick={onCreateGroup}
+          onClick={createGroup}
           className="mb-1.5 flex w-full items-center gap-2 rounded-md border-2 border-dashed border-ink/40 px-2.5 py-2 text-left font-sans text-[13px] font-semibold text-ink/70 transition-colors hover:border-ink hover:text-ink"
         >
           <span>+ new group</span>
@@ -94,18 +63,8 @@ export function Sidebar({
         {visibleGroups.map((g) => (
           <GroupRow
             key={g.id}
-            group={g}
-            meetings={meetings.filter((m) => m.groupId === g.id)}
-            expanded={expandedGroupIds[g.id]}
-            selectedMeetingId={selectedMeetingId}
+            groupId={g.id}
             autoStartEditing={pendingRenameGroupId === g.id}
-            onToggleExpanded={onToggleExpanded}
-            onSelectMeeting={onSelectMeeting}
-            onRename={onRenameGroup}
-            onDelete={onDeleteGroup}
-            onTogglePinned={onTogglePinned}
-            onCreateMeeting={onCreateMeeting}
-            onAutoStartEditingHandled={onClearPendingRename}
           />
         ))}
         {visibleGroups.length === 0 && (
