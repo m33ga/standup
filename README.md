@@ -13,6 +13,8 @@ a tiny app for tracking personal standup updates. groups, meetings, sections. no
 
 try [standup](https://m33ga.github.io/standup/). or don't. you decide.
 
+![Demo](docs/standup-demo.gif)
+
 ## stack
 
 - react + typescript
