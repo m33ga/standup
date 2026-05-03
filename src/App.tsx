@@ -37,7 +37,13 @@ function App() {
 
   const createGroup = () => {
     const id = crypto.randomUUID();
-    setGroups((gs) => [...gs, { id, name: "new group", pinned: false }]);
+    const now = new Date().toISOString();
+
+    setGroups((gs) => [
+      ...gs,
+      { id, name: "new group", pinned: false, createdAt: now },
+    ]);
+
     setExpandedGroupIds((e) => ({ ...e, [id]: true }));
     setQuery("");
     setPendingRenameGroupId(id);
@@ -122,10 +128,15 @@ function App() {
     setTheme((t) => (t === "dark" ? "light" : "dark"));
   };
 
+  const sortedGroups = [...groups].sort((a, b) => {
+    if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
+    return b.createdAt.localeCompare(a.createdAt);
+  });
+
   return (
     <div className="flex min-h-screen bg-paper text-ink">
       <Sidebar
-        groups={groups}
+        groups={sortedGroups}
         meetings={meetings}
         selectedMeetingId={selectedMeetingId}
         expandedGroupIds={expandedGroupIds}

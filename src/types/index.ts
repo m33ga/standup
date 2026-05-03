@@ -16,6 +16,7 @@ export type Group = {
   id: Id;
   name: string;
   pinned: boolean;
+  createdAt: IsoDate;
 };
 
 export type Meeting = {
