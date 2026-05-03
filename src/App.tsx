@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { EmptyState } from "./components/EmptyState";
 import { MeetingView } from "./components/MeetingView";
 import { Sidebar } from "./components/Sidebar";
@@ -18,10 +18,17 @@ function App() {
   );
   const [query, setQuery] = useState("");
   const [theme, setTheme] = useState<Theme>("light");
+  const [pendingRenameGroupId, setPendingRenameGroupId] = useState<Id | null>(
+    null,
+  );
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
+
+  const clearPendingRename = useCallback(() => {
+    setPendingRenameGroupId(null);
+  }, []);
 
   const meeting = meetings.find((m) => m.id === selectedMeetingId);
   const group = meeting
@@ -29,14 +36,11 @@ function App() {
     : undefined;
 
   const createGroup = () => {
-    const name = window.prompt("group name?", "new group");
-    if (!name || !name.trim()) return;
     const id = crypto.randomUUID();
-    setGroups((gs) => [
-      ...gs,
-      { id, name: name.trim().toLowerCase(), pinned: false },
-    ]);
+    setGroups((gs) => [...gs, { id, name: "new group", pinned: false }]);
     setExpandedGroupIds((e) => ({ ...e, [id]: true }));
+    setQuery("");
+    setPendingRenameGroupId(id);
   };
 
   const renameGroup = (id: Id, name: string) => {
@@ -127,6 +131,7 @@ function App() {
         expandedGroupIds={expandedGroupIds}
         query={query}
         theme={theme}
+        pendingRenameGroupId={pendingRenameGroupId}
         onToggleExpanded={toggleExpanded}
         onSelectMeeting={setSelectedMeetingId}
         onQuery={setQuery}
@@ -136,6 +141,7 @@ function App() {
         onDeleteGroup={deleteGroup}
         onTogglePinned={togglePinned}
         onCreateMeeting={createMeeting}
+        onClearPendingRename={clearPendingRename}
       />
       <main className="flex-1">
         {meeting && group ? (

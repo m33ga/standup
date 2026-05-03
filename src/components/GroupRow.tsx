@@ -1,5 +1,5 @@
 import { ChevronDown, Pencil, Pin, Trash2 } from "lucide-react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import type { Group, Id, Meeting } from "../types";
 import { EditableText, type EditableTextHandle } from "./EditableText";
 import { MeetingList } from "./MeetingList";
@@ -9,12 +9,14 @@ type GroupRowProps = {
   meetings: Meeting[];
   expanded: boolean;
   selectedMeetingId: Id | null;
+  autoStartEditing?: boolean;
   onToggleExpanded: (id: Id) => void;
   onSelectMeeting: (id: Id) => void;
   onRename: (id: Id, name: string) => void;
   onDelete: (id: Id) => void;
   onTogglePinned: (id: Id) => void;
   onCreateMeeting: (groupId: Id) => void;
+  onAutoStartEditingHandled?: () => void;
 };
 
 export function GroupRow({
@@ -22,14 +24,23 @@ export function GroupRow({
   meetings,
   expanded,
   selectedMeetingId,
+  autoStartEditing,
   onToggleExpanded,
   onSelectMeeting,
   onRename,
   onDelete,
   onTogglePinned,
   onCreateMeeting,
+  onAutoStartEditingHandled,
 }: GroupRowProps) {
   const nameRef = useRef<EditableTextHandle>(null);
+
+  useEffect(() => {
+    if (autoStartEditing) {
+      nameRef.current?.startEditing();
+      onAutoStartEditingHandled?.();
+    }
+  }, [autoStartEditing, onAutoStartEditingHandled]);
 
   const sorted = [...meetings].sort((a, b) => b.date.localeCompare(a.date));
 

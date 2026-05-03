@@ -10,6 +10,7 @@ type SidebarProps = {
   expandedGroupIds: Record<Id, boolean>;
   query: string;
   theme: Theme;
+  pendingRenameGroupId: Id | null;
   onToggleExpanded: (id: Id) => void;
   onSelectMeeting: (id: Id) => void;
   onQuery: (q: string) => void;
@@ -19,6 +20,7 @@ type SidebarProps = {
   onDeleteGroup: (id: Id) => void;
   onTogglePinned: (id: Id) => void;
   onCreateMeeting: (groupId: Id) => void;
+  onClearPendingRename: () => void;
 };
 
 export function Sidebar({
@@ -28,6 +30,7 @@ export function Sidebar({
   expandedGroupIds,
   query,
   theme,
+  pendingRenameGroupId,
   onToggleExpanded,
   onSelectMeeting,
   onQuery,
@@ -37,6 +40,7 @@ export function Sidebar({
   onDeleteGroup,
   onTogglePinned,
   onCreateMeeting,
+  onClearPendingRename,
 }: SidebarProps) {
   const sortedGroups = [...groups].sort(
     (a, b) => Number(b.pinned) - Number(a.pinned),
@@ -94,12 +98,14 @@ export function Sidebar({
             meetings={meetings.filter((m) => m.groupId === g.id)}
             expanded={expandedGroupIds[g.id]}
             selectedMeetingId={selectedMeetingId}
+            autoStartEditing={pendingRenameGroupId === g.id}
             onToggleExpanded={onToggleExpanded}
             onSelectMeeting={onSelectMeeting}
             onRename={onRenameGroup}
             onDelete={onDeleteGroup}
             onTogglePinned={onTogglePinned}
             onCreateMeeting={onCreateMeeting}
+            onAutoStartEditingHandled={onClearPendingRename}
           />
         ))}
         {visibleGroups.length === 0 && (
