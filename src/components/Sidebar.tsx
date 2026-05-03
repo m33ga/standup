@@ -10,10 +10,15 @@ type SidebarProps = {
   expandedGroupIds: Record<Id, boolean>;
   query: string;
   theme: Theme;
-  onToggleExpanded?: (id: Id) => void;
-  onSelectMeeting?: (id: Id) => void;
-  onQuery?: (q: string) => void;
-  onToggleTheme?: () => void;
+  onToggleExpanded: (id: Id) => void;
+  onSelectMeeting: (id: Id) => void;
+  onQuery: (q: string) => void;
+  onToggleTheme: () => void;
+  onCreateGroup: () => void;
+  onRenameGroup: (id: Id, name: string) => void;
+  onDeleteGroup: (id: Id) => void;
+  onTogglePinned: (id: Id) => void;
+  onCreateMeeting: (groupId: Id) => void;
 };
 
 export function Sidebar({
@@ -27,6 +32,11 @@ export function Sidebar({
   onSelectMeeting,
   onQuery,
   onToggleTheme,
+  onCreateGroup,
+  onRenameGroup,
+  onDeleteGroup,
+  onTogglePinned,
+  onCreateMeeting,
 }: SidebarProps) {
   const sortedGroups = [...groups].sort(
     (a, b) => Number(b.pinned) - Number(a.pinned),
@@ -59,7 +69,7 @@ export function Sidebar({
           <Search size={14} className="text-ink/50" />
           <input
             value={query}
-            onChange={(e) => onQuery?.(e.target.value)}
+            onChange={(e) => onQuery(e.target.value)}
             placeholder="search groups…"
             className="flex-1 bg-transparent font-sans text-sm text-ink outline-none placeholder:text-ink/40"
           />
@@ -70,6 +80,13 @@ export function Sidebar({
         <div className="px-2.5 pt-2.5 pb-1.5 font-sans text-[11px] font-bold tracking-widest text-ink/50 uppercase">
           groups
         </div>
+        <button
+          type="button"
+          onClick={onCreateGroup}
+          className="mb-1.5 flex w-full items-center gap-2 rounded-md border-2 border-dashed border-ink/40 px-2.5 py-2 text-left font-sans text-[13px] font-semibold text-ink/70 transition-colors hover:border-ink hover:text-ink"
+        >
+          <span>+ new group</span>
+        </button>
         {visibleGroups.map((g) => (
           <GroupRow
             key={g.id}
@@ -79,6 +96,10 @@ export function Sidebar({
             selectedMeetingId={selectedMeetingId}
             onToggleExpanded={onToggleExpanded}
             onSelectMeeting={onSelectMeeting}
+            onRename={onRenameGroup}
+            onDelete={onDeleteGroup}
+            onTogglePinned={onTogglePinned}
+            onCreateMeeting={onCreateMeeting}
           />
         ))}
         {visibleGroups.length === 0 && (

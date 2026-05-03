@@ -1,4 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
+
+export type EditableTextHandle = { startEditing: () => void };
 
 type EditableTextProps = {
   value: string;
@@ -9,71 +17,95 @@ type EditableTextProps = {
   placeholder?: string;
   title?: string;
   as?: "h1" | "h2" | "h3" | "span" | "p";
+  clickToEdit?: boolean;
 };
 
-export function EditableText({
-  value,
-  onChange,
-  className = "",
-  inputClassName = "",
-  displayClassName = "",
-  placeholder,
-  title = "click to edit",
-  as: Tag = "span",
-}: EditableTextProps) {
-  const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(value);
-  const ref = useRef<HTMLInputElement>(null);
+export const EditableText = forwardRef<EditableTextHandle, EditableTextProps>(
+  function EditableText(
+    {
+      value,
+      onChange,
+      className = "",
+      inputClassName = "",
+      displayClassName = "",
+      placeholder,
+      title = "click to edit",
+      as: Tag = "span",
+      clickToEdit = true,
+    },
+    ref,
+  ) {
+    const [editing, setEditing] = useState(false);
+    const [draft, setDraft] = useState(value);
+    const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (editing && ref.current) {
-      ref.current.focus();
-      ref.current.select();
-    }
-  }, [editing]);
-
-  const save = () => {
-    onChange(draft.trim() || value); // empty input falls back to original
-    setEditing(false);
-  };
-
-  const cancel = () => {
-    setDraft(value);
-    setEditing(false);
-  };
-
-  if (editing) {
-    return (
-      <input
-        ref={ref}
-        value={draft}
-        onChange={(e) => setDraft(e.target.value)}
-        onBlur={save}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            save();
-          } else if (e.key === "Escape") {
-            e.preventDefault();
-            cancel();
-          }
-        }}
-        placeholder={placeholder}
-        className={`${className} ${inputClassName}`}
-      />
+    useImperativeHandle(
+      ref,
+      () => ({
+        startEditing: () => {
+          setDraft(value);
+          setEditing(true);
+        },
+      }),
+      [value],
     );
-  }
 
-  return (
-    <Tag
-      onClick={() => {
-        setDraft(value);
-        setEditing(true);
-      }}
-      title={title}
-      className={`cursor-text ${className} ${displayClassName}`}
-    >
-      {value}
-    </Tag>
-  );
-}
+    useEffect(() => {
+      if (editing && inputRef.current) {
+        inputRef.current.focus();
+        inputRef.current.select();
+      }
+    }, [editing]);
+
+    const save = () => {
+      onChange(draft.trim() || value);
+      setEditing(false);
+    };
+
+    const cancel = () => {
+      setDraft(value);
+      setEditing(false);
+    };
+
+    if (editing) {
+      return (
+        <input
+          ref={inputRef}
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onBlur={save}
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              save();
+            } else if (e.key === "Escape") {
+              e.preventDefault();
+              cancel();
+            }
+          }}
+          placeholder={placeholder}
+          className={`${className} ${inputClassName}`}
+        />
+      );
+    }
+
+    if (!clickToEdit) {
+      return <Tag className={`${className} ${displayClassName}`}>{value}</Tag>;
+    }
+
+    return (
+      <Tag
+        onClick={() => {
+          setDraft(value);
+          setEditing(true);
+        }}
+        title={title}
+        className={`cursor-text ${className} ${displayClassName}`}
+      >
+        {value}
+      </Tag>
+    );
+  },
+);

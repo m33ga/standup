@@ -1,21 +1,88 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { EmptyState } from "./components/EmptyState";
 import { MeetingView } from "./components/MeetingView";
 import { Sidebar } from "./components/Sidebar";
 import { seedGroups, seedMeetings } from "./types/seed";
-import type { Id, IsoDate, Meeting, SectionKey } from "./types";
+import type { Group, Id, IsoDate, Meeting, SectionKey, Theme } from "./types";
+
+function todayISO(): IsoDate {
+  return new Date().toISOString().slice(0, 10);
+}
 
 function App() {
+  const [groups, setGroups] = useState<Group[]>(seedGroups);
   const [meetings, setMeetings] = useState<Meeting[]>(seedMeetings);
   const [selectedMeetingId, setSelectedMeetingId] = useState<Id | null>("m3");
-  const expandedGroupIds = { g1: true, g2: true };
-  const query = "";
-  const theme = "light" as const;
+  const [expandedGroupIds, setExpandedGroupIds] = useState<Record<Id, boolean>>(
+    { g1: true, g2: true },
+  );
+  const [query, setQuery] = useState("");
+  const [theme, setTheme] = useState<Theme>("light");
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
 
   const meeting = meetings.find((m) => m.id === selectedMeetingId);
   const group = meeting
-    ? seedGroups.find((g) => g.id === meeting.groupId)
+    ? groups.find((g) => g.id === meeting.groupId)
     : undefined;
+
+  const createGroup = () => {
+    const name = window.prompt("group name?", "new group");
+    if (!name || !name.trim()) return;
+    const id = crypto.randomUUID();
+    setGroups((gs) => [
+      ...gs,
+      { id, name: name.trim().toLowerCase(), pinned: false },
+    ]);
+    setExpandedGroupIds((e) => ({ ...e, [id]: true }));
+  };
+
+  const renameGroup = (id: Id, name: string) => {
+    setGroups((gs) => gs.map((g) => (g.id === id ? { ...g, name } : g)));
+  };
+
+  const deleteGroup = (id: Id) => {
+    if (!window.confirm("delete this group and all its meetings?")) return;
+    setGroups((gs) => gs.filter((g) => g.id !== id));
+    setMeetings((ms) => ms.filter((m) => m.groupId !== id));
+    setExpandedGroupIds((e) => {
+      const next = { ...e };
+      delete next[id];
+      return next;
+    });
+    if (meeting?.groupId === id) setSelectedMeetingId(null);
+  };
+
+  const togglePinned = (id: Id) => {
+    setGroups((gs) =>
+      gs.map((g) => (g.id === id ? { ...g, pinned: !g.pinned } : g)),
+    );
+  };
+
+  const createMeeting = (groupId: Id) => {
+    // autofill: previous meeting's willDo -> new meeting's promised
+    const previousMeeting = meetings
+      .filter((m) => m.groupId === groupId)
+      .sort((a, b) => b.date.localeCompare(a.date))[0];
+    const id = crypto.randomUUID();
+    const newMeeting: Meeting = {
+      id,
+      groupId,
+      title: `standup · ${todayISO()}`,
+      date: todayISO(),
+      completed: false,
+      promised: previousMeeting?.willDo ?? "",
+      done: "",
+      willDo: "",
+      discussion: "",
+      notes: "",
+    };
+    setMeetings((ms) => [...ms, newMeeting]);
+    setExpandedGroupIds((e) => ({ ...e, [groupId]: true }));
+    setSelectedMeetingId(id);
+  };
 
   const renameMeeting = (id: Id, title: string) => {
     setMeetings((ms) => ms.map((m) => (m.id === id ? { ...m, title } : m)));
@@ -43,19 +110,37 @@ function App() {
     );
   };
 
+  const toggleExpanded = (id: Id) => {
+    setExpandedGroupIds((e) => ({ ...e, [id]: !e[id] }));
+  };
+
+  const toggleTheme = () => {
+    setTheme((t) => (t === "dark" ? "light" : "dark"));
+  };
+
   return (
     <div className="flex min-h-screen bg-paper text-ink">
       <Sidebar
-        groups={seedGroups}
-        meetings={seedMeetings}
+        groups={groups}
+        meetings={meetings}
         selectedMeetingId={selectedMeetingId}
         expandedGroupIds={expandedGroupIds}
         query={query}
         theme={theme}
+        onToggleExpanded={toggleExpanded}
+        onSelectMeeting={setSelectedMeetingId}
+        onQuery={setQuery}
+        onToggleTheme={toggleTheme}
+        onCreateGroup={createGroup}
+        onRenameGroup={renameGroup}
+        onDeleteGroup={deleteGroup}
+        onTogglePinned={togglePinned}
+        onCreateMeeting={createMeeting}
       />
       <main className="flex-1">
         {meeting && group ? (
           <MeetingView
+            key={meeting.id}
             meeting={meeting}
             group={group}
             onRenameMeeting={renameMeeting}
