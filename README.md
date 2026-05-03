@@ -1,16 +1,24 @@
-# React + Vite
+# standup.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+a tiny app for tracking personal standup updates. groups, meetings, sections. nothing else.
 
-Currently, two official plugins are available:
+## what it does
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- groups of meetings, pinned or not
+- each meeting: promised → done → will do, plus discussion and notes
+- new meeting auto-fills from the previous one's "will do"
+- dark mode. search. editable everything.
+- markdown section. lists. bold.
+- persists to localstorage. refresh freely.
 
-## React Compiler
+try [standup](https://m33ga.github.io/standup/). or don't. you decide.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+![Demo](docs/standup-demo.gif)
 
-## Expanding the ESLint configuration
+## stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- react + typescript
+- tailwind
+- zustand
+- lucide-react for icons
+- vite
