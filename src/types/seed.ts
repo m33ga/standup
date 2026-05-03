@@ -6,11 +6,17 @@ function todayPlus(days: number): string {
   return d.toISOString().slice(0, 10);
 }
 
+function nowPlus(days: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return d.toISOString();
+}
+
 export const seedGroups: Group[] = [
-  { id: "g1", name: "project one", pinned: true },
-  { id: "g2", name: "client · lumen co", pinned: true },
-  { id: "g3", name: "design crit", pinned: false },
-  { id: "g4", name: "ops & people", pinned: false },
+  { id: "g1", name: "project one", pinned: true, createdAt: nowPlus(-10) },
+  { id: "g2", name: "client · lumen co", pinned: true, createdAt: nowPlus(-8) },
+  { id: "g3", name: "design crit", pinned: false, createdAt: nowPlus(-5) },
+  { id: "g4", name: "ops & people", pinned: false, createdAt: nowPlus(-2) },
 ];
 
 export const seedMeetings: Meeting[] = [

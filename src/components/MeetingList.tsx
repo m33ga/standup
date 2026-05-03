@@ -9,7 +9,7 @@ function formatShortDate(iso: string): string {
 type MeetingListProps = {
   meetings: Meeting[];
   selectedMeetingId: Id | null;
-  onSelect?: (id: Id) => void;
+  onSelect: (id: Id) => void;
 };
 
 export function MeetingList({
@@ -33,7 +33,7 @@ export function MeetingList({
           <button
             key={m.id}
             type="button"
-            onClick={() => onSelect?.(m.id)}
+            onClick={() => onSelect(m.id)}
             className={[
               "flex items-center gap-1.5 rounded px-2 py-1 text-left font-sans text-[13px]",
               sel

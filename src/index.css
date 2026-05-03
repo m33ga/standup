@@ -25,6 +25,10 @@
   --shadow-paper-lg: 6px 6px 0 0 var(--color-ink);
 }
 
+.rdp-root.rdp-root {
+  --rdp-accent-color: var(--color-sky);
+}
+
 /* dark theme */
 [data-theme="dark"] {
   --color-paper: #1a1714;

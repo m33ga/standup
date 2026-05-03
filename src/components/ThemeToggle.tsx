@@ -3,7 +3,7 @@ import type { Theme } from "../types";
 
 type ThemeToggleProps = {
   theme: Theme;
-  onToggle?: () => void;
+  onToggle: () => void;
 };
 
 export function ThemeToggle({ theme, onToggle }: ThemeToggleProps) {
