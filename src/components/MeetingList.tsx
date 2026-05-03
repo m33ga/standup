@@ -1,22 +1,18 @@
 import { Check } from "lucide-react";
-import type { Id, Meeting } from "../types";
+import { useStore } from "../store";
+import type { Meeting } from "../types";
 
 function formatShortDate(iso: string): string {
   const [yyyy, mm, dd] = iso.split("-");
   return `${dd}.${mm}.${yyyy}`;
 }
 
-type MeetingListProps = {
-  meetings: Meeting[];
-  selectedMeetingId: Id | null;
-  onSelect: (id: Id) => void;
-};
+type MeetingListProps = { meetings: Meeting[] };
 
-export function MeetingList({
-  meetings,
-  selectedMeetingId,
-  onSelect,
-}: MeetingListProps) {
+export function MeetingList({ meetings }: MeetingListProps) {
+  const selectedMeetingId = useStore((s) => s.selectedMeetingId);
+  const selectMeeting = useStore((s) => s.selectMeeting);
+
   if (meetings.length === 0) {
     return (
       <div className="px-1.5 py-1 font-hand text-base text-ink/50">
@@ -33,7 +29,7 @@ export function MeetingList({
           <button
             key={m.id}
             type="button"
-            onClick={() => onSelect(m.id)}
+            onClick={() => selectMeeting(m.id)}
             className={[
               "flex items-center gap-1.5 rounded px-2 py-1 text-left font-sans text-[13px]",
               sel

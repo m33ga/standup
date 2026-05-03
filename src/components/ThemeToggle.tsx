@@ -1,16 +1,14 @@
 import { Moon, Sun } from "lucide-react";
-import type { Theme } from "../types";
+import { useStore } from "../store";
 
-type ThemeToggleProps = {
-  theme: Theme;
-  onToggle: () => void;
-};
+export function ThemeToggle() {
+  const theme = useStore((s) => s.theme);
+  const toggleTheme = useStore((s) => s.toggleTheme);
 
-export function ThemeToggle({ theme, onToggle }: ThemeToggleProps) {
   return (
     <button
       type="button"
-      onClick={onToggle}
+      onClick={toggleTheme}
       title={theme === "dark" ? "light mode" : "dark mode"}
       aria-label={
         theme === "dark" ? "switch to light mode" : "switch to dark mode"

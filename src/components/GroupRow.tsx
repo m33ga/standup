@@ -1,46 +1,39 @@
 import { ChevronDown, Pencil, Pin, Trash2 } from "lucide-react";
 import { useEffect, useRef } from "react";
-import type { Group, Id, Meeting } from "../types";
+import { useStore } from "../store";
+import type { Id } from "../types";
 import { EditableText, type EditableTextHandle } from "./EditableText";
 import { MeetingList } from "./MeetingList";
+import { useShallow } from "zustand/shallow";
 
 type GroupRowProps = {
-  group: Group;
-  meetings: Meeting[];
-  expanded: boolean;
-  selectedMeetingId: Id | null;
+  groupId: Id;
   autoStartEditing?: boolean;
-  onToggleExpanded: (id: Id) => void;
-  onSelectMeeting: (id: Id) => void;
-  onRename: (id: Id, name: string) => void;
-  onDelete: (id: Id) => void;
-  onTogglePinned: (id: Id) => void;
-  onCreateMeeting: (groupId: Id) => void;
-  onAutoStartEditingHandled?: () => void;
 };
 
-export function GroupRow({
-  group,
-  meetings,
-  expanded,
-  selectedMeetingId,
-  autoStartEditing,
-  onToggleExpanded,
-  onSelectMeeting,
-  onRename,
-  onDelete,
-  onTogglePinned,
-  onCreateMeeting,
-  onAutoStartEditingHandled,
-}: GroupRowProps) {
+export function GroupRow({ groupId, autoStartEditing }: GroupRowProps) {
+  const group = useStore((s) => s.groups.find((g) => g.id === groupId));
+  const meetings = useStore(
+    useShallow((s) => s.meetings.filter((m) => m.groupId === groupId)),
+  );
+  const expanded = useStore((s) => s.expandedGroupIds[groupId]);
+  const toggleExpanded = useStore((s) => s.toggleExpanded);
+  const renameGroup = useStore((s) => s.renameGroup);
+  const deleteGroup = useStore((s) => s.deleteGroup);
+  const togglePinned = useStore((s) => s.togglePinned);
+  const createMeeting = useStore((s) => s.createMeeting);
+  const clearPendingRename = useStore((s) => s.clearPendingRename);
+
   const nameRef = useRef<EditableTextHandle>(null);
 
   useEffect(() => {
     if (autoStartEditing) {
       nameRef.current?.startEditing();
-      onAutoStartEditingHandled?.();
+      clearPendingRename();
     }
-  }, [autoStartEditing, onAutoStartEditingHandled]);
+  }, [autoStartEditing, clearPendingRename]);
+
+  if (!group) return null;
 
   const sorted = [...meetings].sort((a, b) => b.date.localeCompare(a.date));
 
@@ -49,7 +42,7 @@ export function GroupRow({
       <div className="group flex items-center gap-1.5 rounded px-2 py-1.5 hover:bg-ink/[0.03]">
         <button
           type="button"
-          onClick={() => onToggleExpanded(group.id)}
+          onClick={() => toggleExpanded(group.id)}
           className="flex min-w-0 flex-1 items-center gap-1.5 text-left"
         >
           <ChevronDown
@@ -63,7 +56,7 @@ export function GroupRow({
             ref={nameRef}
             as="span"
             value={group.name}
-            onChange={(name) => onRename(group.id, name)}
+            onChange={(name) => renameGroup(group.id, name)}
             clickToEdit={false}
             className="min-w-0 flex-1 truncate border-2 px-1 py-px font-sans text-sm font-semibold text-ink"
             displayClassName="border-transparent"
@@ -75,7 +68,7 @@ export function GroupRow({
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              onTogglePinned(group.id);
+              togglePinned(group.id);
             }}
             aria-label={group.pinned ? "unpin" : "pin to top"}
             title={group.pinned ? "unpin" : "pin to top"}
@@ -99,7 +92,7 @@ export function GroupRow({
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              onDelete(group.id);
+              deleteGroup(group.id);
             }}
             aria-label="delete group"
             title="delete"
@@ -114,16 +107,12 @@ export function GroupRow({
         <div className="mt-1 mb-2 ml-5 border-l border-dashed border-ink/30 pl-2.5">
           <button
             type="button"
-            onClick={() => onCreateMeeting(group.id)}
+            onClick={() => createMeeting(group.id)}
             className="mt-1 flex items-center gap-1.5 rounded px-2 py-1 font-sans text-xs font-semibold text-ink/55 hover:text-ink"
           >
             + new meeting
           </button>
-          <MeetingList
-            meetings={sorted}
-            selectedMeetingId={selectedMeetingId}
-            onSelect={onSelectMeeting}
-          />
+          <MeetingList meetings={sorted} />
         </div>
       )}
     </div>
